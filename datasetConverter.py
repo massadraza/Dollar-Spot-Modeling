@@ -47,6 +47,15 @@ def shoulderSeasonsOnly():
 
     return df_shoulder_season
 
-shoulderSeasonsOnly()
+def counter():
+    df = pd.read_csv("Smith-Kerns Dataset 2026.csv")
+
+    print((df == ".").sum())
+
+
+
+#shoulderSeasonsOnly()
 
 # 846 Observations
+
+counter()
