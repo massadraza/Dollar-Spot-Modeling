@@ -7,6 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
+
 def random_Forest_Regressor_meanONLY():
     df = pd.read_csv("Shoulder_Season_Data.csv")
 
@@ -22,7 +23,8 @@ def random_Forest_Regressor_meanONLY():
     model = RandomForestRegressor(
         n_estimators=100,
         max_depth=10,
-        random_state=42
+        random_state=42,
+        n_jobs=-1  # ----> Use all available CPU cores
     )
 
     model.fit(X_train, Y_train)
@@ -37,7 +39,17 @@ def random_Forest_Regressor_meanONLY():
     print(f"RMSE: {rmse:.4f}")
     print(f"R^2: {r2:.4f}")
 
-def random_Forest_Regressor_meanANDmax():
+#random_Forest_Regressor_meanONLY()
+
+"""
+Using a mean only approach is not good because the model cannot account 
+for mins and maxes which will hurt the RMSE which penalizes LARGE errors
+
+"""
+
+
+
+def random_Forest_Regressor_meanANDmaxANDmin():
     df = pd.read_csv("Shoulder_Season_Data.csv")
 
     features_mean = ['meanLW', 'meanST', 'meanSM', 'meanRH', 'meanAT', 'maxLW', 'maxSM', 
@@ -52,8 +64,9 @@ def random_Forest_Regressor_meanANDmax():
 
     model = RandomForestRegressor(
         n_estimators=100,
-        max_depth=10,
-        random_state=42
+        max_depth=15,
+        random_state=42,
+        min_samples_leaf=5
     )
 
     model.fit(X_train, Y_train)
@@ -63,11 +76,12 @@ def random_Forest_Regressor_meanANDmax():
     rmse = np.sqrt(mean_squared_error(Y_test, y_pred))
     r2 = r2_score(Y_test, y_pred)
  
-    print("======= BASIC METRICS (MEAN and MAX included) =======")
+    print("======= BASIC METRICS (MEAN and MAX/MIN included) =======")
     print(f"MAE: {mae:.4f}")
     print(f"RMSE: {rmse:.4f}")
     print(f"R^2: {r2:.4f}")
-
+   
+    """
     importances = model.feature_importances_
 
     feature_importances_df = pd.DataFrame({
@@ -83,7 +97,16 @@ def random_Forest_Regressor_meanANDmax():
     plt.gca().invert_yaxis()
     plt.show()
 
+    """
+"""
+Accuracy has somewhat improved but more can still be done
 
+
+"""
+
+random_Forest_Regressor_meanANDmaxANDmin()
+
+# NOT A GOOD MODEL
 def random_Forest_Regressor_maxONLY():
     df = pd.read_csv("Shoulder_Season_Data.csv")
 
@@ -114,7 +137,7 @@ def random_Forest_Regressor_maxONLY():
     print(f"RMSE: {rmse:.4f}")
     print(f"R^2: {r2:.4f}")
 
-
+# NOT A GOOD IDEA
 def random_Forest_Regressor_Optimized1():
     df = pd.read_csv("Shoulder_Season_Data.csv")
 
@@ -145,10 +168,11 @@ def random_Forest_Regressor_Optimized1():
     print(f"RMSE: {rmse:.4f}")
     print(f"R^2: {r2:.4f}")
 
+# NOT A GOOD IDEA
 def random_Forest_Regressor_Optimized2():
     df = pd.read_csv("Shoulder_Season_Data.csv")
 
-    features_mean = ['minRH', 'meanRH', 'meanAT']
+    features_mean = ['minRH', 'meanRH', 'meanAT'] 
 
     X = df[features_mean].dropna()
     Y = df.loc[X.index, 'Foci']
@@ -194,10 +218,17 @@ def random_Forest_Regressor_Optimized2():
     print(f"RMSE: {rmse:.4f}")
     print(f"R^2: {r2:.4f}")
 
+    print("Best Hyperparameters:")
+    for k, v in search.best_params_.items():
+        print(f" {k}: {v}")
 
 
 #random_Forest_Regressor_meanONLY()
+
+
+
 #random_Forest_Regressor_meanANDmax()
 #random_Forest_Regressor_maxONLY()
 #random_Forest_Regressor_Optimized1()
-random_Forest_Regressor_Optimized2()
+#random_Forest_Regressor_Optimized2()
+
