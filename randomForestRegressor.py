@@ -7,14 +7,16 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor, RandomForestClassifier
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score, classification_report
 
-def random_Forest_Regressor_meanANDmaxANDmin():
+# Log transformation applied to the target variable 
+def random_Forest_Regressor_meanANDmaxANDmin_LOG():
     df = pd.read_csv("Shoulder_Season_Data.csv")
 
     features_mean = ['meanLW', 'meanST', 'meanSM', 'meanRH', 'meanAT', 'maxLW', 'maxSM', 
                      'maxRH', 'maxAT', 'maxRF', 'minST', 'minSM', 'minRH', 'minAT']
 
     X = df[features_mean].dropna()
-    Y = df.loc[X.index, 'Foci']
+
+    Y = np.log1p(df.loc[X.index, 'Foci'])
     
     X_train, X_test, Y_train, Y_test = train_test_split(
         X, Y, test_size=0.2, random_state=42
@@ -28,18 +30,24 @@ def random_Forest_Regressor_meanANDmaxANDmin():
     )
 
     model.fit(X_train, Y_train)
-    y_pred = model.predict(X_test)
+    
+    y_pred_log = model.predict(X_test)
+    y_pred = np.expm1(y_pred_log)
+    y_true = np.expm1(Y_test)
 
-    mae = mean_absolute_error(Y_test, y_pred)
-    rmse = np.sqrt(mean_squared_error(Y_test, y_pred))
-    r2 = r2_score(Y_test, y_pred)
+    mae = mean_absolute_error(y_true, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+    r2 = r2_score(y_true, y_pred)
  
     print("======= BASIC METRICS (MEAN and MAX/MIN included) =======")
     print(f"MAE: {mae:.4f}")
     print(f"RMSE: {rmse:.4f}")
     print(f"R^2: {r2:.4f}")
    
+#random_Forest_Regressor_meanANDmaxANDmin_LOG()
 
+
+# Best Model Thus Far - not anymore
 def random_Forest_Regressor_meanANDmaxANDminV1():
     df = pd.read_csv("Shoulder_Season_Data.csv")
 
@@ -85,6 +93,7 @@ def random_Forest_Regressor_meanANDmaxANDminV1():
     print(f"RMSE: {rmse:.4f}")
     print(f"R^2: {r2:.4f}")
 
+    """
     importances = pd.Series(
         model.feature_importances_,
         index=features_mean
@@ -92,11 +101,60 @@ def random_Forest_Regressor_meanANDmaxANDminV1():
 
     print("\n Feature Importances: ")
     print(importances)
+    """
     
     #print(df['Foci'].describe())
 
-#random_Forest_Regressor_meanANDmaxANDmin()
-random_Forest_Regressor_meanANDmaxANDminV1()
+#random_Forest_Regressor_meanANDmaxANDminV1()
+
+def random_Forest_Regressor_meanANDmaxANDminV1_MoreFeatures():
+    df = pd.read_csv("Shoulder_Season_Data.csv")
+
+    df['rangeRH'] = df['maxRH'] - df['minRH']
+    df['rangeSM'] = df['maxSM'] - df['minSM']
+    df['rangeAT'] = df['maxAT'] - df['minAT']
+
+    df['SM_AT'] = df['meanSM'] * df['meanAT']
+    df['RH_AT'] = df['meanRH'] * df['meanAT']
+    df['SM_RH'] = df['meanSM'] * df['meanRH']
+    
+    features_mean = ['meanLW', 'meanST', 'meanSM', 'meanRH', 'meanAT', 'maxLW', 'maxSM', 
+                     'maxRH', 'maxAT', 'maxRF', 'minST', 'minSM', 'minRH', 'minAT',
+                     'rangeRH', 'rangeSM', 'rangeAT', 'SM_AT', 'RH_AT', 'SM_RH', 'Obs', 'Rep', 'Rating', 'Date']
+
+    X = df[features_mean].dropna()
+    Y = np.log1p(df.loc[X.index, 'Foci'])
+    
+    X_train, X_test, Y_train, Y_test = train_test_split(
+        X, Y, test_size=0.2, random_state=42
+    )
+
+    model = RandomForestRegressor(
+        n_estimators=150,
+        random_state=42,
+        min_samples_leaf=7,
+        n_jobs=-1
+     #   max_depth=10,
+     #max_features="sqrt"
+    )
+
+    model.fit(X_train, Y_train)
+
+    y_pred_log = model.predict(X_test)
+
+    y_pred = np.expm1(y_pred_log)
+    y_true = np.expm1(Y_test)
+
+    mae = mean_absolute_error(y_true, y_pred)
+    rmse = np.sqrt(mean_squared_error(y_true, y_pred))
+    r2 = r2_score(y_true, y_pred)
+ 
+    print("======= BASIC METRICS (MEAN and MAX/MIN included - FEATURE ENGINEERED) - more features =======")
+    print(f"MAE: {mae:.4f}")
+    print(f"RMSE: {rmse:.4f}")
+    print(f"R^2: {r2:.4f}")
+
+random_Forest_Regressor_meanANDmaxANDminV1_MoreFeatures()
 
 def random_Forest_Regressor_Tuned_Model():
     df = pd.read_csv("Shoulder_Season_Data.csv")
@@ -159,5 +217,6 @@ def random_Forest_Regressor_Tuned_Model():
     print(f"MAE : {mean_absolute_error(y_true, y_pred):.4f}")
     print(f"RMSE: {np.sqrt(mean_squared_error(y_true, y_pred)):.4f}")
     print(f"R^2 : {r2_score(y_true, y_pred):.4f}")
+
 
 #random_Forest_Regressor_Tuned_Model()
