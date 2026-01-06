@@ -47,8 +47,6 @@ for mins and maxes which will hurt the RMSE which penalizes LARGE errors
 
 """
 
-
-
 def random_Forest_Regressor_meanANDmaxANDmin():
     df = pd.read_csv("Shoulder_Season_Data.csv")
 
@@ -105,3 +103,6 @@ Accuracy has somewhat improved but more can still be done
 """
 
 random_Forest_Regressor_meanANDmaxANDmin()
+
+
+# Done STEP 1
