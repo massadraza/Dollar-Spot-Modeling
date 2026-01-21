@@ -25,13 +25,23 @@ def gradient_boosting_model_encoded_FEATURE_ENGINEERED():
     y = df["Foci"]
     y_log = np.log1p(y)
 
+    
     X['rangeRH'] = X['maxRH'] - X['minRH']
     X['rangeSM'] = X['maxSM'] - X['minSM']
     X['rangeAT'] = X['maxAT'] - X['minAT']
+    
 
     X['SM_AT'] = X['meanSM'] * X['meanAT']
     X['RH_AT'] = X['meanRH'] * X['meanAT']
-    X['SM_RH'] = X['meanSM'] * X['meanRH']
+    #X['SM_RH'] = X['meanSM'] * X['meanRH'] #--> Removed to improve accuracy
+
+    X['LW_RH'] = X['meanLW'] * X['meanRH']  # wetness × humidity
+    #X['LW_AT'] = X['meanLW'] * X['meanAT']  # wetness × air temp - not good
+    
+    
+    # Dropping these columns resulted in an overall improvement in the accuracy of th
+    # e model
+    X = X.drop(columns=["maxLW", "maxST", "maxSM", "maxAT", "maxRF", "minST", "minAT"])
 
     categorical_cols = ["Season"]
 
@@ -83,9 +93,20 @@ R²:   0.4037
 
 """
 
+""" 
+Best model with obs and rep removed 
+
+=========== GRADIENT BOOSTING METRICS (FEATURE ENGINEERED) ===========
+RMSE: 5.0905
+MAE:  1.9254
+R²:   0.4289
+
+"""
+
 """
 With removing the obs and rep, there is a significant reduction
 in the accuract of the model. As noted, obs and rep should not 
 be providing any acutal meaning in regards to disease pressure
 prediction.
+
 """
