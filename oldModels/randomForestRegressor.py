@@ -120,7 +120,7 @@ def random_Forest_Regressor_meanANDmaxANDminV1_MoreFeatures():
     
     features_mean = ['meanLW', 'meanST', 'meanSM', 'meanRH', 'meanAT', 'maxLW', 'maxSM', 
                      'maxRH', 'maxAT', 'maxRF', 'minST', 'minSM', 'minRH', 'minAT',
-                     'rangeRH', 'rangeSM', 'rangeAT', 'SM_AT', 'RH_AT', 'SM_RH', 'Obs', 'Rep', 'Rating', 'Date']
+                     'rangeRH', 'rangeSM', 'rangeAT', 'SM_AT', 'RH_AT', 'SM_RH','Date']
 
     X = df[features_mean].dropna()
     Y = np.log1p(df.loc[X.index, 'Foci'])

@@ -14,8 +14,9 @@ from sklearn.tree import plot_tree
 def gradient_boosting_model_encoded_FEATURE_ENGINEERED():
     df = pd.read_csv("Shoulder_Season_Data.csv")
 
+    # Converted the date into a dayofyear (1-365)
     feature_cols = [
-        "Rating", "Date", "Year", "Season",
+        "Rating", "DayOfYear", "Year", "Season",
         "meanLW", "meanST", "meanSM", "meanRH", "meanAT", "meanRF",
         "maxLW", "maxST", "maxSM", "maxRH", "maxAT", "maxRF",
         "minST", "minSM", "minRH", "minAT"
@@ -25,27 +26,45 @@ def gradient_boosting_model_encoded_FEATURE_ENGINEERED():
     y = df["Foci"]
     y_log = np.log1p(y)
 
-    
+    # Feature Engineering
     X['rangeRH'] = X['maxRH'] - X['minRH']
     X['rangeSM'] = X['maxSM'] - X['minSM']
     X['rangeAT'] = X['maxAT'] - X['minAT']
-    
-
     X['SM_AT'] = X['meanSM'] * X['meanAT']
-    X['RH_AT'] = X['meanRH'] * X['meanAT']
+    #X['RH_AT'] = X['meanRH'] * X['meanAT']
     #X['SM_RH'] = X['meanSM'] * X['meanRH'] #--> Removed to improve accuracy
-
     X['LW_RH'] = X['meanLW'] * X['meanRH']  # wetness × humidity
     #X['LW_AT'] = X['meanLW'] * X['meanAT']  # wetness × air temp - not good
-    
-    
-    # Dropping these columns resulted in an overall improvement in the accuracy of th
-    # e model
+
+    # THESE FEATURED ENGINEERED VARIABLES HAVE 0 IMPACT
+
+    #X['RH_High'] = (X['meanRH'] >= 80).astype(int)
+    #X['AT_warm'] = (X['meanAT'] >= 25).astype(int)
+    #X['LW_wet'] = (X['meanLW'] >= 4).astype(int)
+    #X['SM_dry'] = (X['meanSM'] <= 30).astype(int)
+    #X['favorable'] = ((X['meanRH'] >= 75) & (X['meanAT'] >= 20)).astype(int)
+
+    # Add these after your existing feature engineering (line ~37):
+
+    # HIGH IMPACT - Normalized interaction (best new feature!)
+    #X['combined_normalized'] = ((X['meanAT'] - 15) / 15) * ((X['meanRH'] - 50) / 50)
+
+    # Temperature differential features
+    #X['AT_ST_diff'] = X['meanAT'] - X['meanST']      # Air minus soil temp
+    #X['AT_to_ST'] = X['meanAT'] / (X['meanST'] + 0.1) # Air to soil ratio
+
+    # Quadratic terms (capture non-linear effects)
+    #X['RH_squared'] = X['meanRH'] ** 2
+    #X['AT_squared'] = X['meanAT'] ** 2
+
+    # Disease pressure index
+    #X['disease_index'] = (X['meanRH']/100) * (X['meanAT']/30) * (X['meanLW']/10)
+
+
+    # Dropping these columns resulted in an overall improvement in the accuracy of the model
     X = X.drop(columns=["maxLW", "maxST", "maxSM", "maxAT", "maxRF", "minST", "minAT"])
-
+    
     categorical_cols = ["Season"]
-
-    numeric_cols = [c for c in feature_cols if c not in categorical_cols]
     
     preprocess = ColumnTransformer(
         transformers=[
@@ -58,7 +77,7 @@ def gradient_boosting_model_encoded_FEATURE_ENGINEERED():
         ("preprocess", preprocess),
         ("model", GradientBoostingRegressor(
             n_estimators=300,
-            learning_rate=0.05,
+            learning_rate=0.02,
             max_depth=3,
             random_state=42
         ))

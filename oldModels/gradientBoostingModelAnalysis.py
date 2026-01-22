@@ -13,7 +13,7 @@ def gradient_boosting_model_encoded_FEATURE_ENGINEERED():
     df = pd.read_csv("Shoulder_Season_Data.csv")
 
     feature_cols = [
-        "Rating", "Date", "Year", "Season", "Obs", "Rep",
+        "Rating", "Date", "Year", "Season",
         "meanLW", "meanST", "meanSM", "meanRH", "meanAT", "meanRF",
         "maxLW", "maxST", "maxSM", "maxRH", "maxAT", "maxRF",
         "minST", "minSM", "minRH", "minAT"

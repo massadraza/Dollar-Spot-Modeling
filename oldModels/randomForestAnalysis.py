@@ -56,6 +56,17 @@ def random_Forest_Regressor_meanANDmaxANDminV1_MoreFeatures():
     print(f"RMSE: {rmse:.4f}")
     print(f"R^2: {r2:.4f}")
 
+    residuals = y_true - y_pred
+    
+    plt.figure(figsize=(8,5))
+    plt.scatter(y_pred, residuals, alpha=0.6)
+    plt.axhline(0)
+    plt.xlabel("Predicted Foci")
+    plt.ylabel("Residuals (True - Predicted)")
+    plt.title("Residual Plot: Random Forest Regressor")
+    plt.show()
+    
+
     """
 
     importances = model.feature_importances_

@@ -1,6 +1,5 @@
 import pandas as pd
 import numpy as np
-
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.ensemble import GradientBoostingRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -166,7 +165,7 @@ def gradient_boosting_model_encoded_log():
     df = pd.read_csv("Shoulder_Season_Data.csv")
 
     feature_cols = [
-        "Rating", "Date", "Year", "Season", "Obs", "Rep",
+        "Rating", "Date", "Year", "Season",
         "meanLW", "meanST", "meanSM", "meanRH", "meanAT", "meanRF",
         "maxLW", "maxST", "maxSM", "maxRH", "maxAT", "maxRF",
         "minST", "minSM", "minRH", "minAT"
@@ -354,7 +353,7 @@ def gradient_boosting_model_encoded_FEATURE_ENGINEERED():
     print(f"MAE:  {mae:.4f}")
     print(f"R²:   {r2:.4f}")
 
-gradient_boosting_model_encoded_FEATURE_ENGINEERED()
+#gradient_boosting_model_encoded_FEATURE_ENGINEERED()
 
 #gradient_boosting_baselineModel()
 #gradient_boosting_baselineModel_log()
@@ -362,7 +361,7 @@ gradient_boosting_model_encoded_FEATURE_ENGINEERED()
 #gradient_boosting_baselineModel_log()
 #gradient_boosting_model_encoded_log()
 #gradient_boosting_model_encoded_log_TUNED()
-#gradient_boosting_model_encoded_FEATURE_ENGINEERED() # ---> New Best Model So Far
+gradient_boosting_model_encoded_FEATURE_ENGINEERED() # ---> New Best Model So Far
 
 """
 Gradient Boosting Model Encoded Log Is the Best ML Model Thus Far
