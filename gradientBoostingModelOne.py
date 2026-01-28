@@ -66,3 +66,14 @@ print("-"*50)
 for _, row in importance.iterrows():
     bar = "█" * int(row['Importance'] * 50)
     print(f"{row['Feature']:12} {row['Importance']:.4f} {bar}")
+
+"""
+==================================================
+BASELINE RESULTS (original features, no aggregation)
+==================================================
+R² (original scale): 0.0307
+CV R² (5-fold): -160.0496 ± 313.8870
+RMSE: 271.63
+MAE: 73.27
+
+"""

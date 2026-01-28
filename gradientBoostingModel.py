@@ -45,8 +45,8 @@ print(f"After filtering (Foci <= 100): {len(df_daily)} days")
 # ============================================================
 feature_cols = (
     [f'{c}_5d' for c in weather_cols] +  # 5-day weather averages
-    ['temp_humidity_5d', 'leafwet_humidity_5d', 'dewpoint_diff_5d'] +  # Interactions
-    ['Foci_lag1']  # Previous day's foci
+    ['temp_humidity_5d', 'leafwet_humidity_5d', 'dewpoint_diff_5d']  +  # Interactions
+     ['Foci_lag1']  # Previous day's foci
 )
 
 X = df_daily[feature_cols]
@@ -64,9 +64,6 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 print(f"\nTrain: {len(X_train)}, Test: {len(X_test)}")
 
-# ============================================================
-# TRAIN MODEL
-# ============================================================
 model = GradientBoostingRegressor(
     n_estimators=200,
     max_depth=4,
@@ -78,9 +75,7 @@ model = GradientBoostingRegressor(
 
 model.fit(X_train, y_train)
 
-# ============================================================
-# EVALUATE
-# ============================================================
+
 y_pred = np.maximum(model.predict(X_test), 0)
 
 r2 = r2_score(y_test, y_pred)
@@ -97,7 +92,7 @@ print(f"RMSE: {rmse:.2f}")
 print(f"MAE: {mae:.2f}")
 
 
-"""
+
 # ============================================================
 # FEATURE IMPORTANCE
 # ============================================================
@@ -111,4 +106,3 @@ print("-"*50)
 for _, row in importance.iterrows():
     bar = "█" * int(row['Importance'] * 50)
     print(f"{row['Feature']:22} {row['Importance']:.4f} {bar}")
-"""
